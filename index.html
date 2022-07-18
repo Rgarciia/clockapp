@@ -18,17 +18,17 @@
 
 <body style="background-repeat: no-repeat;">
     <main>
-        <div  style="position: absolute; right: 10px; z-index: 1; top: 10px;">
+        <div style="position: absolute; right: 10px; z-index: 1; top: 10px;">
             <div class="col-12 col-sm-6 col-lg-12">
                 <div class="card bg-secondary text-white" style="background-color: #6c757d87!important;">
-                  <div class="card-body">
-                    <div class="icon"></div>
-                    <h3 class="card-title temp">-°C</h3>
-                    <h6 class="card-subtitle mb-2 summary"></h6>
-                    <h6 class="card-subtitle mb-2 location"></h6>
-                  </div>
+                    <div class="card-body">
+                        <div class="icon"></div>
+                        <h3 class="card-title temp">-°C</h3>
+                        <h6 class="card-subtitle mb-2 summary"></h6>
+                        <h6 class="card-subtitle mb-2 location"></h6>
+                    </div>
                 </div>
-              </div>
+            </div>
         </div>
         <div class="container d-flex h-100">
             <div class="row align-self-center w-100">
@@ -45,12 +45,79 @@
             </div>
         </div>
     </main>
-    <script src="js/unsplash_api.js"></script>
-    <script src="js/weather.js"></script>
+    <script>
+        let clientID = "NsaE17tzMJR0ydKo1eU7QvcTAL1CnxU3hA3g291_FIU";
+        let page = Math.floor(Math.random() * 10)
+        let endpoint = 'https://api.unsplash.com/search/photos?page=' + page + '&query=nature&client_id=' + clientID;
+        var element = document.querySelector("body");
+        let date = new Date();
+        let output = String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear();
+
+        document.getElementById("date").innerHTML = output;
+
+
+        fetch(endpoint)
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (jsonData) {
+                //console.log(jsonData.results[page].urls.raw);
+                element.background = jsonData.results[page].urls.raw + "&w=965&dpr=2";
+                window.setInterval(function () {
+                    let page2 = Math.floor(Math.random() * 10)
+                    element.background = jsonData.results[page2].urls.raw + "&w=965&dpr=2";
+                }, 10000);
+            })
+    </script>
     <script>
         $(document).ready(function () {
             $('.flipTimer').flipTimer({ direction: 'up' });
         });
+    </script>
+    <script>
+        // Declaring the variables
+        let lon;
+        let lat;
+        let temperature = document.querySelector(".temp");
+        let summary = document.querySelector(".summary");
+        let loc = document.querySelector(".location");
+        let icon = document.querySelector(".icon");
+        const kelvin = 273;
+
+        window.addEventListener("load", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    console.log(position);
+                    lon = position.coords.longitude;
+                    lat = position.coords.latitude;
+
+                    // API ID
+                    const api = "6d055e39ee237af35ca066f35474e9df";
+
+                    // API URL
+                    const base =
+                        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&` +
+                        `lon=${lon}&appid=6d055e39ee237af35ca066f35474e9df`;
+
+                    // Calling the API
+                    fetch(base)
+                        .then((response) => {
+                            return response.json();
+                        })
+                        .then((data) => {
+                            console.log(data);
+                            temperature.textContent =
+                                Math.floor(data.main.temp - kelvin) + "°C";
+                            summary.textContent = data.weather[0].description;
+                            loc.textContent = data.name + "," + data.sys.country;
+                            let icon1 = data.weather[0].icon;
+                            icon.innerHTML =
+                                `<img src="https://openweathermap.org/img/wn/${icon1}@4x.png" style= 'height:10rem'/>`;
+                        });
+                });
+            }
+        });
+
     </script>
 </body>
 
